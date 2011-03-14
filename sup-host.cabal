@@ -1,0 +1,26 @@
+Name:                sup-host
+Version:             0.0.0.1
+Synopsis:            Check if hosts are up
+License-file:        LICENSE
+Author:              Jasper Van der Jeugt
+Maintainer:          jaspervdj@gmail.com
+Stability:           Experimental
+Category:            Application
+Build-type:          Simple
+Cabal-version:       >= 1.2
+
+Executable sup-host
+  Ghc-options:       -Wall -O2 -threaded
+  Main-is:           SupHost/App.hs
+  Hs-source-dirs:    src
+  Other-modules:     SupHost.Host,
+                     SupHost.Views
+  Build-depends:     base >= 4 && < 5,
+                     snap-core >= 0.2,
+                     snap-server >= 0.2,
+                     mtl >= 2,
+                     blaze-html >= 0.2,
+                     bytestring >= 0.9,
+                     wol >= 0.1.1,
+                     haskell98 >= 1.1,
+                     MonadCatchIO-transformers >= 0.2
