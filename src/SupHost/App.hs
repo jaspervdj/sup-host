@@ -75,5 +75,5 @@ main = do
             progName <- getProgName
             putStrLn $ "Usage: " ++ progName ++ " <port> <host file>"
   where
-    config port = addListen (ListenHttp "127.0.0.1" port)
+    config port = addListen (ListenHttp "0.0.0.0" port)
                 $ emptyConfig
