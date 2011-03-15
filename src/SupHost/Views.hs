@@ -30,7 +30,9 @@ indexView hosts = docTypeHtml $ do
     body $ do
         h1 $ "Sup"
         ul $ forM_ hosts $ \host-> li ! A.id (toValue $ toId host) $ do
-            "Checking..."
+            "Checking "
+            toHtml $ hostName host
+            "..."
             script ! type_ "text/javascript" $ toHtml $
                 "showHost('" ++ hostName host ++ "');"
 
