@@ -24,7 +24,7 @@ import Snap.Types ( MonadSnap (..), Snap, route, ifTop, getParam
                   )
 
 import SupHost.Host
-import SupHost.Views
+import qualified SupHost.Views as Views
 
 -- | Application monad stack
 --
@@ -42,11 +42,6 @@ respondBlaze html = do
     modifyResponse $ addHeader "Content-Type" "text/html; charset=UTF-8"
     writeLBS $ renderHtml html
 
-index :: App ()
-index = do
-    hosts <- ask
-    respondBlaze $ indexView hosts
-
 withHost :: (Host -> App ()) -> App ()
 withHost f = do
     -- Find the host in the list
@@ -59,16 +54,21 @@ withHost f = do
         Just host -> f host
         Nothing   -> return ()
 
+index :: App ()
+index = do
+    hosts <- ask
+    respondBlaze $ Views.index hosts
+
 wakeHost :: App ()
 wakeHost = do
     withHost $ liftIO . wake
-    respondBlaze "WoL signal sent"
+    respondBlaze $ Views.wakeHost
 
 showHost :: App ()
 showHost = withHost $ \host -> do
     awake <- liftIO $ isAwake host
     liftIO $ putStrLn $ "Checked: " ++ show host
-    respondBlaze $ hostView host awake
+    respondBlaze $ Views.showHost host awake
 
 site :: App ()
 site = serveDirectory "static" <|> route

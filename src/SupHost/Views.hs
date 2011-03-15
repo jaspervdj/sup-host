@@ -3,8 +3,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 module SupHost.Views
-    ( indexView
-    , hostView
+    ( index
+    , wakeHost
+    , showHost
     ) where
 
 import Control.Monad (forM_, unless)
@@ -16,8 +17,8 @@ import Text.Blaze.Html5.Attributes
 
 import SupHost.Host (Host (..))
 
-indexView :: [Host] -> Html
-indexView hosts = docTypeHtml $ do
+index :: [Host] -> Html
+index hosts = docTypeHtml $ do
     H.head $ do
         H.title "Sup Host"
         script ! type_ "text/javascript" ! src "jquery-1.5.1.min.js" $ mempty
@@ -37,8 +38,11 @@ indexView hosts = docTypeHtml $ do
   where
     attr = dataAttribute "host" . toValue . hostName
 
-hostView :: Host -> Bool -> Html
-hostView host awake = do
+wakeHost :: Html
+wakeHost = "WoL signal sent"
+
+showHost :: Host -> Bool -> Html
+showHost host awake = do
     if awake then "Up and running!"
              else "Asleep"
     unless awake $
