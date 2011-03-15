@@ -5,7 +5,7 @@ module Main
     ( main
     ) where
 
-import Control.Applicative (Alternative, Applicative, (<$>))
+import Control.Applicative (Alternative, Applicative, (<$>), (<|>))
 import Control.Monad.CatchIO (MonadCatchIO)
 import Control.Monad (MonadPlus)
 import Control.Monad.Trans (MonadIO, lift, liftIO)
@@ -13,12 +13,14 @@ import Control.Monad.Reader (MonadReader, ReaderT, runReaderT, ask)
 import System.Environment (getProgName, getArgs)
 import Data.Maybe (listToMaybe)
 
+import Text.Blaze (Html)
 import Text.Blaze.Renderer.Utf8 (renderHtml)
 import qualified Data.ByteString.Char8 as SBC
 import Snap.Http.Server (httpServe)
 import Snap.Http.Server.Config (ConfigListen (..), addListen, emptyConfig)
+import Snap.Util.FileServe (serveDirectory)
 import Snap.Types ( MonadSnap (..), Snap, route, ifTop, getParam
-                  , modifyResponse, addHeader, writeLBS, redirect
+                  , modifyResponse, addHeader, writeLBS
                   )
 
 import SupHost.Host
@@ -35,15 +37,18 @@ newtype App a = App
 instance MonadSnap App where
     liftSnap = App . lift
 
+respondBlaze :: Html -> App ()
+respondBlaze html = do
+    modifyResponse $ addHeader "Content-Type" "text/html; charset=UTF-8"
+    writeLBS $ renderHtml html
+
 index :: App ()
 index = do
     hosts <- ask
-    awake <- mapM (liftIO . isAwake) hosts
-    modifyResponse $ addHeader "Content-Type" "text/html; charset=UTF-8"
-    writeLBS $ renderHtml $ indexView $ zip hosts awake
+    respondBlaze $ indexView hosts
 
-wakeHost :: App ()
-wakeHost = do
+withHost :: (Host -> App ()) -> App ()
+withHost f = do
     -- Find the host in the list
     name <- fmap SBC.unpack <$> getParam "host"
     hosts <- ask
@@ -51,15 +56,25 @@ wakeHost = do
 
     -- With the host...
     case maybeHost of
-        Just host -> liftIO $ wake host
+        Just host -> f host
         Nothing   -> return ()
 
-    redirect "../" 
+wakeHost :: App ()
+wakeHost = do
+    withHost $ liftIO . wake
+    respondBlaze "WoL signal sent"
+
+showHost :: App ()
+showHost = withHost $ \host -> do
+    awake <- liftIO $ isAwake host
+    liftIO $ putStrLn $ "Checked: " ++ show host
+    respondBlaze $ hostView host awake
 
 site :: App ()
-site = route
+site = serveDirectory "static" <|> route
     [ ("", ifTop index)
     , ("/:host/wake", wakeHost)
+    , ("/:host", showHost)
     ]
 
 main :: IO ()
