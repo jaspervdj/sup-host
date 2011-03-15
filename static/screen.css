@@ -1,0 +1,49 @@
+html {
+    background-color: white;
+    color: black;
+    font-size: 20px;
+    font-family: 'Garamond', 'Georgia', 'Palatino', serif;
+}
+
+body {
+    width: 300px;
+    margin: 10px auto 100px auto;
+}
+
+a {
+    color: black;
+}
+
+h1 {
+    text-align: center;
+    font-size: 35px;
+}
+
+ul {
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    padding: 10px 0px 10px 0px;
+    list-style-type: none;
+}
+
+li {
+    height: 40px;
+}
+
+span.host-name {
+    font-weight: bold;
+}
+
+span.host-content {
+    float: right;
+}
+
+span.host-content form {
+    display: inline;
+    margin-left: 10px;
+}
+
+footer {
+    font-size: 15px;
+    text-align: center;
+}

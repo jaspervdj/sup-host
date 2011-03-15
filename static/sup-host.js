@@ -1,5 +1,5 @@
 function findHostElement(host) {
-    return $("li:contains('" + host + "')");
+    return $('li[data-host="' + host + '"]').children('.host-content');
 }
 
 function showHost(host) {

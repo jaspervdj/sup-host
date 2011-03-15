@@ -9,37 +9,36 @@ module SupHost.Views
 
 import Control.Monad (forM_, unless)
 import Data.Monoid (mempty)
-import Data.Char (isAlphaNum)
 
 import Text.Blaze.Html5
 import qualified Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes
-import qualified Text.Blaze.Html5.Attributes as A
 
 import SupHost.Host (Host (..))
-
-toId :: Host -> String
-toId = filter isAlphaNum . hostName
 
 indexView :: [Host] -> Html
 indexView hosts = docTypeHtml $ do
     H.head $ do
-        H.title "Sup"
+        H.title "Sup Host"
         script ! type_ "text/javascript" ! src "jquery-1.5.1.min.js" $ mempty
         script ! type_ "text/javascript" ! src "sup-host.js" $ mempty
+        link ! rel "stylesheet" ! type_ "text/css" ! href "screen.css"
     body $ do
-        h1 $ "Sup"
-        ul $ forM_ hosts $ \host-> li ! A.id (toValue $ toId host) $ do
-            "Checking "
-            toHtml $ hostName host
-            "..."
+        h1 $ "Sup Host"
+        ul $ forM_ hosts $ \host-> li ! attr host $ do
+            H.span ! class_ "host-name" $ toHtml $ hostName host
+            ": "
+            H.span ! class_ "host-content" $
+                img ! src "loader.gif" ! alt "Loading..."
             script ! type_ "text/javascript" $ toHtml $
                 "showHost('" ++ hostName host ++ "');"
+        footer $ a ! href "http://github.com/jaspervdj/sup-host"
+                   $ "source code"
+  where
+    attr = dataAttribute "host" . toValue . hostName
 
 hostView :: Host -> Bool -> Html
 hostView host awake = do
-    b $ toHtml name'
-    ": "
     if awake then "Up and running!"
              else "Asleep"
     unless awake $
