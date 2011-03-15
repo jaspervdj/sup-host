@@ -20,6 +20,7 @@ import SupHost.Host (Host (..))
 index :: [Host] -> Html
 index hosts = docTypeHtml $ do
     H.head $ do
+        meta ! httpEquiv "Content-Type" ! content "text/html; charset=UTF-8"
         H.title "Sup Host"
         script ! type_ "text/javascript" ! src "jquery-1.5.1.min.js" $ mempty
         script ! type_ "text/javascript" ! src "sup-host.js" $ mempty
