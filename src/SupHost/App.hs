@@ -12,6 +12,8 @@ import Control.Monad.Trans (MonadIO, lift, liftIO)
 import Control.Monad.Reader (MonadReader, ReaderT, runReaderT, ask)
 import System.Environment (getProgName, getArgs)
 import Data.Maybe (listToMaybe)
+import Data.Time (getZonedTime, formatTime)
+import System.Locale (defaultTimeLocale)
 
 import Text.Blaze (Html)
 import Text.Blaze.Renderer.Utf8 (renderHtml)
@@ -57,7 +59,11 @@ withHost f = do
 index :: App ()
 index = do
     hosts <- ask
-    respondBlaze $ Views.index hosts
+    time <- formatTime defaultTimeLocale "%H:%M:%S" <$> liftIO getZonedTime
+    respondBlaze $ Views.index hosts time
+
+    -- Autorefresh header
+    modifyResponse $ addHeader "Refresh" "30"
 
 wakeHost :: App ()
 wakeHost = do

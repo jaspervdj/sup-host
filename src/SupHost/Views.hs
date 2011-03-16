@@ -17,8 +17,8 @@ import Text.Blaze.Html5.Attributes
 
 import SupHost.Host (Host (..))
 
-index :: [Host] -> Html
-index hosts = docTypeHtml $ do
+index :: [Host] -> String -> Html
+index hosts time' = docTypeHtml $ do
     H.head $ do
         meta ! httpEquiv "Content-Type" ! content "text/html; charset=UTF-8"
         H.title "Sup Host"
@@ -34,8 +34,9 @@ index hosts = docTypeHtml $ do
                 img ! src "loader.gif" ! alt "Loading..."
             script ! type_ "text/javascript" $ toHtml $
                 "showHost('" ++ hostName host ++ "');"
-        footer $ a ! href "http://github.com/jaspervdj/sup-host"
-                   $ "source code"
+        footer $ do
+            p $ "Last updated " >> toHtml time'
+            a ! href "http://github.com/jaspervdj/sup-host" $ "source code"
   where
     attr = dataAttribute "host" . toValue . hostName
 
